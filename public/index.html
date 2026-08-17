@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Todo Manager</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div>
+                <p class="small-title">PRODUCTIVITY <span class="auth-logo">
+                      ✓
+                 </span></p>
+
+                 <button id="logoutBtn" class="logout-btn">⏻ LogOut</button>
+                  
+                <h1>Todo Manager</h1>
+
+                <p class="subtitle">
+                    Organize your tasks and stay productive.
+                </p>
+            </div>
+
+            <div class="stats">
+
+                <div class="stat-card">
+                    <span id="totalCount">0</span>
+                    <small>Total</small>
+                </div>
+
+                <div class="stat-card">
+                    <span id="pendingCount">0</span>
+                    <small>Pending</small>
+                </div>
+
+                <div class="stat-card">
+                    <span id="completedCount">0</span>
+                    <small>Completed</small>
+                </div>
+
+                
+
+                <button id="themeToggle" class="theme-toggle">
+                    🌙
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- ADD TODO -->
+
+        <section class="form-section">
+
+            <div class="section-title">
+
+                <div class="title-icon">+</div>
+
+                <div>
+                    <h2>Add New Todo</h2>
+
+                    <p>
+                        Create a new task and manage it from here.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <form id="todoForm">
+
+                <div class="input-group">
+
+                    <label for="title">
+                        Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="title"
+                        placeholder="Enter todo title"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label for="description">
+                        Description
+                    </label>
+
+                    <input
+                        type="text"
+                        id="description"
+                        placeholder="Enter description"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="input-group">
+
+                        <label for="priority">
+                            Priority
+                        </label>
+
+                        <select id="priority">
+
+                            <option value="Low">
+                                Low
+                            </option>
+
+                            <option value="Medium" selected>
+                                Medium
+                            </option>
+
+                            <option value="High">
+                                High
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label for="status">
+                            Status
+                        </label>
+
+                        <select id="status">
+
+                            <option value="Pending">
+                                Pending
+                            </option>
+
+                            <option value="In Progress">
+                                In Progress
+                            </option>
+
+                            <option value="Completed">
+                                Completed
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                    id="submitBtn"
+                >
+                    <span>+</span>
+                    Add Todo
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- FILTER -->
+
+        <section class="filter-section">
+
+            <div class="filter-heading">
+
+                <div>
+
+                    <h2>Your Todos</h2>
+
+                    <p>
+                        Manage and track all your tasks.
+                    </p>
+
+                </div>
+
+                <button
+                    class="clear-filter"
+                    onclick="clearFilters()"
+                >
+                    Clear Filters
+                </button>
+
+            </div>
+
+
+            <div class="filters">
+
+                <div class="filter-group">
+
+                    <label>
+                        Status
+                    </label>
+
+                    <select
+                        id="filterStatus"
+                        onchange="applyFilters()"
+                    >
+
+                        <option value="">
+                            All Status
+                        </option>
+
+                        <option value="Pending">
+                            Pending
+                        </option>
+
+                        <option value="In Progress">
+                            In Progress
+                        </option>
+
+                        <option value="Completed">
+                            Completed
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-group">
+
+                    <label>
+                        Priority
+                    </label>
+
+                    <select
+                        id="filterPriority"
+                        onchange="applyFilters()"
+                    >
+
+                        <option value="">
+                            All Priority
+                        </option>
+
+                        <option value="High">
+                            High
+                        </option>
+
+                        <option value="Medium">
+                            Medium
+                        </option>
+
+                        <option value="Low">
+                            Low
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-group search-box">
+
+                    <label>
+                        Search
+                    </label>
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search todos..."
+                        oninput="searchTodos()"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- TODO LIST -->
+
+        <section class="todos-section">
+
+            <div id="todoList">
+
+                <!-- Todos will appear here -->
+
+            </div>
+
+            <div
+                id="emptyMessage"
+                class="empty-message"
+            >
+
+                <div class="empty-icon">
+                    ✓
+                </div>
+
+                <h3>
+                    No Todos Found
+                </h3>
+
+                <p>
+                    Add a new todo to get started.
+                </p>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- EDIT MODAL -->
+
+    <div
+        id="editModal"
+        class="modal"
+    >
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <p class="small-title">
+                        UPDATE TASK
+                    </p>
+
+                    <h2>Edit Todo</h2>
+
+                </div>
+
+                <button
+                    class="close-btn"
+                    onclick="closeEditModal()"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <form id="editForm">
+
+                <input
+                    type="hidden"
+                    id="editId"
+                >
+
+
+                <div class="input-group">
+
+                    <label>
+                        Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="editTitle"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label>
+                        Description
+                    </label>
+
+                    <input
+                        type="text"
+                        id="editDescription"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="input-group">
+
+                        <label>
+                            Priority
+                        </label>
+
+                        <select id="editPriority">
+
+                            <option value="Low">
+                                Low
+                            </option>
+
+                            <option value="Medium">
+                                Medium
+                            </option>
+
+                            <option value="High">
+                                High
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="input-group">
+
+                        <label>
+                            Status
+                        </label>
+
+                        <select id="editStatus">
+
+                            <option value="Pending">
+                                Pending
+                            </option>
+
+                            <option value="In Progress">
+                                In Progress
+                            </option>
+
+                            <option value="Completed">
+                                Completed
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-actions">
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        onclick="closeEditModal()"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="primary-btn"
+                    >
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

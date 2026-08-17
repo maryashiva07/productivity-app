@@ -1,0 +1,64 @@
+services:
+
+  app:
+    build: .
+    container_name: todo-app
+
+    ports:
+      - "6555:6555"
+
+    env_file:
+      - .env
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+    restart: unless-stopped
+
+
+  mysql:
+    image: mysql:8.0
+    container_name: todo-mysql
+
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: todo
+      MYSQL_USER: todo_user
+      MYSQL_PASSWORD: todo_password
+
+    ports:
+      - "3307:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    restart: unless-stopped
+
+
+  redis:
+    image: redis:7
+    container_name: todo-redis
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis_data:/data
+
+    restart: unless-stopped
+
+
+volumes:
+
+  mysql_data:
+
+  redis_data:
