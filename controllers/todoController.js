@@ -1,242 +1,9 @@
-// const {Op, json} = require("sequelize");
-// const Todos = require("../modules/Todo");
-// const {redisClient} = require("../config/redis");
-
-
-// //Insert todos
-// const createTodos = async (req, res) =>{
-//      try{
-//           const {title, description, priority, status} = req.body;
-
-//           const userId = req.user.id;
-
-//           const newTodo = await Todos.create({
-//                title,
-//                description,
-//                priority,
-//                status,
-
-//                userId
-//           });
-
-         
-
-//           //clear all todo caches
-//           const keys = await redisClient.keys("todos:*");
-
-//           if(keys.length > 0){
-//              await redisClient.del(keys);
-//           }
-
-//           res.status(201).json(newTodo);
-//      }
-//      catch(err){
-//          res.status(500).json({
-//              message: "Error on Todo creatiion!",
-//              err: err.message
-//          })
-//      }
-// };
-
-
-// //get all todos
-
-// const getTodos = async (req, res) =>{
-//       try{
-//            const {status, priority} = req.query;
-//            const where = {};
-
-//            if(status){
-//               where.status = status;
-//            }
-
-//            if(priority){
-//               where.priority = priority;
-//            }
-
-//            // different cache key for diff filters
-//            const cacheKey = `todos:${status || "all"}:${priority || "all"}`;
-//            //check on redis first
-//            const cachedTodos = await redisClient.get(cacheKey);
-
-//            if(cachedTodos){
-//               console.log("data comming from Redis!");
-              
-//               return res.json(JSON.parse(cachedTodos));
-//            }
-
-//            //if data not on redis
-
-//            console.log("data comming from mySql");
-
-//             const allTodos = await Todos.findAll({
-//                   where: where
-//             });
-
-//             //store result on redis
-
-//             await redisClient.setEx(
-//                   cacheKey,
-//                   60,
-//                   JSON.stringify(allTodos)
-//             );
-
-//             res.json(allTodos);
-//       }
-//       catch(err){
-//          res.status(500).json({
-//              message: "Find error on todos",
-//              err: err.message
-//          })
-//       }
-// };
-
-
-// //get todos by id
-
-// const getTodosById = async (req, res) =>{
-//      try{
-//            const id = req.params.id;
-
-//            //check redis
-//            const cachedKey = `newTodo:${id}`;
-
-//            const cachedTodo = await redisClient.get(cachedKey);
-
-//            if(cachedTodo){
-//               console.log("Todo coming from Redis");
-//               return res.json(JSON.parse(cachedTodo));
-//            }
-
-//            //check mysql
-//            console.log("data comming from my sql");
-
-//            const newTodo = await Todos.findByPk(id);
-
-//            if(!newTodo){
-//               return res.status(404).json("Todo not found!");
-//            }
-
-//            //set data on redis
-//            await redisClient.setEx(
-//                cachedKey,
-//                60,
-//                JSON.stringify(newTodo)
-//            )
-
-//            res.status(200).json(newTodo);
-//      }
-//      catch(err){
-//         res.status(500).json({
-//             message: "Error fetching todo",
-//             err: err.message
-//         })
-//      }
-// };
-
-
-// //delete todo
-
-// const delTodos = async (req, res) =>{
-//      try{
-//           const id = req.params.id;
-
-//           const delTodo = await Todos.destroy({
-//               where:{
-//                  id: id
-//               }
-//           })
-
-//           if(delTodo===0){
-//              return res.status(404).json("todo not found!");
-//           }
-
-//           //clear redis cached
-//           const keys = await redisClient.keys("todos:*");
-
-//           if(keys.length>0){
-//               await redisClient.del(keys);
-//           }
-
-//           res.json("Todo deleted successfully");
-//      }
-//      catch(err){
-//          res.status(500).json({
-//              message: "error find on deletion",
-//              err: err.message
-//          })
-//      }
-// };
-
-
-// //edit todos
-
-// const editTodos = async (req, res)=>{
-//     try{
-//           const id = req.params.id;
-//           const {title, description, priority, status} = req.body;
-
-//           const [updated] = await Todos.update(
-//                {
-//                    title,
-//                    description,
-//                    priority,
-//                    status
-//                },
-//                {
-//                   where:{
-//                       id: id
-//                   }
-//                }
-//           );
-
-//           if(updated===0){
-//               return res.status(404).json("Error on Updation!");
-//           }
-
-//           const updateId = await Todos.findByPk(id);
-
-//         //Clear redis caches
-//         const keys = await redisClient.keys("todos:*");
-//         if(keys.length>0){
-//              await redisClient.del(keys);
-//         }
-
-//           res.json(updateId);
-//     }
-//     catch(err){
-//          res.status(500).json({
-//               message: "found error!",
-//               err: err.message
-//          })
-//     }
-// };
-
-
-// module.exports = {
-//     createTodos,
-//     getTodos,
-//     getTodosById,
-//     delTodos,
-//     editTodos
-// };
-
-
-
-
-
-
-
-
-
 const { Op } = require("sequelize");
 const Todos = require("../modules/Todo");
 const { redisClient } = require("../config/redis");
 
 
-// ======================================================
 // INSERT TODO
-// ======================================================
 
 const createTodos = async (req, res) => {
 
@@ -250,9 +17,7 @@ const createTodos = async (req, res) => {
         } = req.body;
 
 
-        // ==========================================
         // UPDATED: Get userId from JWT middleware
-        // ==========================================
 
         const userId = req.user.id;
 
@@ -264,18 +29,14 @@ const createTodos = async (req, res) => {
             priority,
             status,
 
-            // ==========================================
             // UPDATED: Save owner of this Todo
-            // ==========================================
 
             userId
         });
 
-
-        // ==========================================
+       
         // UPDATED:
         // Clear only this user's Todo caches
-        // ==========================================
 
         const keys = await redisClient.keys(
             `todos:${userId}:*`
@@ -304,9 +65,7 @@ const createTodos = async (req, res) => {
 
 
 
-// ======================================================
 // GET ALL TODOS
-// ======================================================
 
 const getTodos = async (req, res) => {
 
@@ -318,20 +77,17 @@ const getTodos = async (req, res) => {
         } = req.query;
 
 
-        // ==========================================
         // UPDATED:
         // Get logged-in user's ID
-        // ==========================================
 
         const userId = req.user.id;
 
 
         const where = {
 
-            // ==========================================
+          
             // UPDATED:
             // Only get current user's Todos
-            // ==========================================
 
             userId: userId
 
@@ -347,19 +103,13 @@ const getTodos = async (req, res) => {
             where.priority = priority;
         }
 
-
-        // ==========================================
         // UPDATED:
         // User-specific Redis cache key
-        // ==========================================
 
         const cacheKey =
             `todos:${userId}:${status || "all"}:${priority || "all"}`;
 
-
-        // ==========================================
         // Check Redis first
-        // ==========================================
 
         const cachedTodos =
             await redisClient.get(cacheKey);
@@ -377,9 +127,7 @@ const getTodos = async (req, res) => {
         }
 
 
-        // ==========================================
         // If not found in Redis → MySQL
-        // ==========================================
 
         console.log(
             "Data coming from MySQL"
@@ -394,9 +142,7 @@ const getTodos = async (req, res) => {
             });
 
 
-        // ==========================================
         // Store result in Redis
-        // ==========================================
 
         await redisClient.setEx(
 
@@ -426,10 +172,7 @@ const getTodos = async (req, res) => {
 };
 
 
-
-// ======================================================
 // GET TODO BY ID
-// ======================================================
 
 const getTodosById = async (req, res) => {
 
@@ -438,26 +181,20 @@ const getTodosById = async (req, res) => {
         const id = req.params.id;
 
 
-        // ==========================================
         // UPDATED:
         // Get logged-in user
-        // ==========================================
 
         const userId = req.user.id;
 
 
-        // ==========================================
         // UPDATED:
         // User-specific Todo cache
-        // ==========================================
 
         const cachedKey =
             `todo:${userId}:${id}`;
 
 
-        // ==========================================
         // Check Redis
-        // ==========================================
 
         const cachedTodo =
             await redisClient.get(cachedKey);
@@ -475,21 +212,17 @@ const getTodosById = async (req, res) => {
         }
 
 
-        // ==========================================
         // If not Redis → MySQL
-        // ==========================================
 
         console.log(
             "Data coming from MySQL"
         );
 
 
-        // ==========================================
+
         // UPDATED:
         // Don't use findByPk(id)
-        //
         // Because we must check ownership
-        // ==========================================
 
         const newTodo =
             await Todos.findOne({
@@ -515,10 +248,7 @@ const getTodosById = async (req, res) => {
 
         }
 
-
-        // ==========================================
         // Store in Redis
-        // ==========================================
 
         await redisClient.setEx(
 
@@ -549,9 +279,7 @@ const getTodosById = async (req, res) => {
 
 
 
-// ======================================================
 // DELETE TODO
-// ======================================================
 
 const delTodos = async (req, res) => {
 
@@ -560,18 +288,14 @@ const delTodos = async (req, res) => {
         const id = req.params.id;
 
 
-        // ==========================================
         // UPDATED:
         // Get logged-in user
-        // ==========================================
 
         const userId = req.user.id;
 
 
-        // ==========================================
         // UPDATED:
         // Delete ONLY if Todo belongs to user
-        // ==========================================
 
         const delTodo =
             await Todos.destroy({
@@ -598,10 +322,8 @@ const delTodos = async (req, res) => {
         }
 
 
-        // ==========================================
         // UPDATED:
         // Delete this user's Todo list caches
-        // ==========================================
 
         const keys =
             await redisClient.keys(
@@ -616,10 +338,8 @@ const delTodos = async (req, res) => {
         }
 
 
-        // ==========================================
         // UPDATED:
         // Delete individual Todo cache too
-        // ==========================================
 
         await redisClient.del(
             `todo:${userId}:${id}`
@@ -647,10 +367,7 @@ const delTodos = async (req, res) => {
 };
 
 
-
-// ======================================================
 // EDIT TODO
-// ======================================================
 
 const editTodos = async (req, res) => {
 
@@ -667,18 +384,14 @@ const editTodos = async (req, res) => {
         } = req.body;
 
 
-        // ==========================================
         // UPDATED:
         // Get logged-in user
-        // ==========================================
 
         const userId = req.user.id;
 
 
-        // ==========================================
         // UPDATED:
         // Update only user's Todo
-        // ==========================================
 
         const [updated] =
             await Todos.update(
@@ -717,10 +430,7 @@ const editTodos = async (req, res) => {
 
         }
 
-
-        // ==========================================
         // Get updated Todo
-        // ==========================================
 
         const updateId =
             await Todos.findOne({
@@ -736,10 +446,8 @@ const editTodos = async (req, res) => {
             });
 
 
-        // ==========================================
         // UPDATED:
         // Clear user's Todo list caches
-        // ==========================================
 
         const keys =
             await redisClient.keys(
@@ -754,10 +462,8 @@ const editTodos = async (req, res) => {
         }
 
 
-        // ==========================================
         // UPDATED:
         // Clear individual Todo cache
-        // ==========================================
 
         await redisClient.del(
             `todo:${userId}:${id}`
@@ -781,10 +487,6 @@ const editTodos = async (req, res) => {
 };
 
 
-
-// ======================================================
-// EXPORT
-// ======================================================
 
 module.exports = {
 
