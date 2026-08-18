@@ -1,9 +1,6 @@
 const API_URL = "/api";
 
-
-// ================================
 // LOGIN
-// ================================
 
 const loginForm = document.getElementById("loginForm");
 
@@ -78,10 +75,8 @@ if (loginForm) {
 }
 
 
-
-// ================================
 // SIGNUP
-// ================================
+
 
 const signupForm = document.getElementById("signupForm");
 
